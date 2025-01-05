@@ -69,18 +69,18 @@ jobs:
         with:
           version: v0.5.1
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to Quay
-        uses: docker/login-action@v2
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_TOKEN }}
+      # - name: Login to Quay
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: quay.io
+      #     username: ${{ secrets.QUAY_USERNAME }}
+      #     password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Login to GHCR
         uses: docker/login-action@v2
@@ -95,12 +95,13 @@ jobs:
           context: .
           file: ./buildscripts/provisioner-nfs/provisioner-nfs.Dockerfile
           push: true
+          provenance: false
           platforms: ${{ env.IMAGE_ARCH }}
           tags: |
             ${{ steps.docker_meta.outputs.tags }}
           build-args: |
             DBUILD_DATE=${{ steps.date.outputs.DATE }}
-            DBUILD_REPO_URL=https://github.com/openebs/dynamic-nfs-provisioner
+            DBUILD_REPO_URL=https://github.com/jimsihk/dynamic-nfs-provisioner
             DBUILD_SITE_URL=https://openebs.io
             RELEASE_TAG=${{ env.RELEASE_TAG }}
 
@@ -149,18 +150,18 @@ jobs:
         with:
           version: v0.5.1
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to Quay
-        uses: docker/login-action@v2
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_TOKEN }}
+      # - name: Login to Quay
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: quay.io
+      #     username: ${{ secrets.QUAY_USERNAME }}
+      #     password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Login to GHCR
         uses: docker/login-action@v2
@@ -175,6 +176,7 @@ jobs:
           context: ./nfs-server-container
           file: nfs-server-container/Dockerfile
           push: true
+          provenance: false
           platforms: ${{ env.IMAGE_ARCH }}
           tags: |
             ${{ steps.docker_meta.outputs.tags }}
