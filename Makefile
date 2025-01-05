@@ -98,6 +98,10 @@ ifeq (${DBUILD_SITE_URL}, )
   export DBUILD_SITE_URL
 endif
 
+ifeq (${EXPORT_PATH}, )
+  EXPORT_PATH = /tmp
+endif
+
 export DBUILD_ARGS=--build-arg DBUILD_DATE=${DBUILD_DATE} --build-arg DBUILD_REPO_URL=${DBUILD_REPO_URL} --build-arg DBUILD_SITE_URL=${DBUILD_SITE_URL} --build-arg RELEASE_TAG=${TAG}
 
 # include the buildx recipes
@@ -178,6 +182,21 @@ nfs-server-image:
 	@echo "--> nfs-server image    "
 	@echo "----------------------------"
 	@cd nfs-server-container && docker build -t ${NFS_SERVER_IMAGE_TAG} . --no-cache
+
+#Use this to extract and load image for sharing acorss GitHub actions
+.PHONY: output-image
+output-image:
+	@echo "--> Export ${PROVISIONER_NFS_IMAGE_TAG} image to ${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar";
+	@docker image save --output "${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar" ${PROVISIONER_NFS_IMAGE_TAG}
+	@echo "--> Export ${NFS_SERVER_IMAGE_TAG} to ${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar";
+	@docker image save --output "${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar" ${NFS_SERVER_IMAGE_TAG}
+
+.PHONY: load-image
+load-image:
+	@echo "--> Load provisioner-nfs image";
+	@docker image load --input "${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar"
+	@echo "--> Load nfs-server image";
+	@docker image load --input "${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar"
 
 .PHONY: license-check
 license-check:

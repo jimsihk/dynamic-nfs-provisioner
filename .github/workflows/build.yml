@@ -26,6 +26,14 @@ on:
       - '*.md'
       - 'LICENSE'
 
+env:
+  GO_VERSION: 1.19.13
+  PROVISIONER_NFS_IMAGE: provisioner-nfs
+  NFS_SERVER_IMAGE: nfs-server-alpine
+  EXPORT_PATH: /tmp
+  IMAGE_ORG: ${{ github.repository_owner }}
+  IMAGE_ARCH: linux/amd64,linux/arm64,linux/arm/v7,linux/ppc64le
+
 jobs:
   lint:
     # to ignore builds on release
@@ -55,29 +63,73 @@ jobs:
       - name: Upload Coverage Report
         uses: codecov/codecov-action@v1
   
-  sanity-test:
+  sanity-build:
     # to ignore builds on release
     if: ${{ (github.event.ref_type != 'tag') }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        kubernetes: [v1.27.3]
     needs: ['lint', 'unit-test']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Go 1.19
-        uses: actions/setup-go@v4
+      - name: Set up Go
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.19.13
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Build provisioner-nfs image
         run: make provisioner-nfs-image
 
       - name: Build nfs-server-alpine image
         run: make nfs-server-image
+
+      - name: Export images
+        run: make output-image
+
+      - name: Upload provisioner-nfs image
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROVISIONER_NFS_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}/${{ env.PROVISIONER_NFS_IMAGE }}.tar
+
+      - name: Upload nfs-server-alpine image
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NFS_SERVER_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}/${{ env.NFS_SERVER_IMAGE }}.tar
+
+  sanity-test:
+    # to ignore builds on release
+    if: ${{ (github.event.ref_type != 'tag') }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: true
+      matrix:
+        kubernetes: [v1.27.3, v1.29.12, v1.30.8, v1.31.0]
+    needs: ['lint', 'unit-test', 'sanity-build']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Download provisioner-nfs image
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.PROVISIONER_NFS_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}
+
+      - name: Download nfs-server-alpine image
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.NFS_SERVER_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}
+
+      - name: Load images
+        run: make load-image
 
       - name: Install NFS utils
         run: |
@@ -87,7 +139,7 @@ jobs:
         uses: medyagh/setup-minikube@latest
         with:
           cache: false
-          minikube-version: 1.31.1
+          minikube-version: 1.34.0
           driver: none
           kubernetes-version: ${{ matrix.kubernetes }}
           cni: calico
@@ -108,16 +160,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Go 1.19
+      - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.19.13
-
-      - name: Set Image Org
-        # sets the default IMAGE_ORG to openebs
-        run: |
-          [ -z "${{ secrets.IMAGE_ORG }}" ] && IMAGE_ORG=openebs || IMAGE_ORG=${{ secrets.IMAGE_ORG}}
-          echo "IMAGE_ORG=${IMAGE_ORG}" >> $GITHUB_ENV
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Set CI Tag
         run: |
@@ -187,7 +233,7 @@ jobs:
           context: .
           file: ./buildscripts/provisioner-nfs/provisioner-nfs.Dockerfile
           push: true
-          platforms: linux/amd64, linux/arm64, linux/arm/v7, linux/ppc64le
+          platforms: ${{ env.IMAGE_ARCH }}
           tags: |
             ${{ steps.docker_meta.outputs.tags }}
           build-args: |
@@ -201,12 +247,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set Image Org
-        # sets the default IMAGE_ORG to openebs
-        run: |
-          [ -z "${{ secrets.IMAGE_ORG }}" ] && IMAGE_ORG=openebs || IMAGE_ORG=${{ secrets.IMAGE_ORG}}
-          echo "IMAGE_ORG=${IMAGE_ORG}" >> $GITHUB_ENV
 
       - name: Set CI Tag
         run: |
@@ -271,7 +311,7 @@ jobs:
           context: ./nfs-server-container
           file: nfs-server-container/Dockerfile
           push: true
-          platforms: linux/amd64, linux/arm64, linux/arm/v7, linux/ppc64le
+          platforms: ${{ env.IMAGE_ARCH }}
           tags: |
             ${{ steps.docker_meta.outputs.tags }}
 
@@ -281,11 +321,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set Image Org
-        # sets the default IMAGE_ORG to openebs
-        run: |
-          [ -z "${{ secrets.IMAGE_ORG }}" ] && IMAGE_ORG=openebs || IMAGE_ORG=${{ secrets.IMAGE_ORG}}
-          echo "IMAGE_ORG=${IMAGE_ORG}" >> $GITHUB_ENV
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
