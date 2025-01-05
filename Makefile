@@ -185,12 +185,12 @@ nfs-server-image:
 
 #Use this to extract and load image for sharing acorss GitHub actions
 .PHONY: output-provisioner-nfs-image
-output-image:
+output-provisioner-nfs-image:
 	@echo "--> Export ${PROVISIONER_NFS_IMAGE_TAG} image to ${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar";
 	@docker image save --output "${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar" ${PROVISIONER_NFS_IMAGE_TAG}
 
 .PHONY: output-nfs-server-image
-output-image:
+output-nfs-server-image:
 	@echo "--> Export ${NFS_SERVER_IMAGE_TAG} to ${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar";
 	@docker image save --output "${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar" ${NFS_SERVER_IMAGE_TAG}
 
