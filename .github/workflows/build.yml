@@ -184,9 +184,10 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           # add each registry to which the image needs to be pushed here
+          # images: |
+          #   ${{ env.IMAGE_ORG }}/provisioner-nfs
+          #   quay.io/${{ env.IMAGE_ORG }}/provisioner-nfs
           images: |
-            ${{ env.IMAGE_ORG }}/provisioner-nfs
-            quay.io/${{ env.IMAGE_ORG }}/provisioner-nfs
             ghcr.io/${{ env.IMAGE_ORG }}/provisioner-nfs
           tags: |
             type=raw,value=latest,enable=false
@@ -263,9 +264,10 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           # add each registry to which the image needs to be pushed here
+          # images: |
+          #   ${{ env.IMAGE_ORG }}/nfs-server-alpine
+          #   quay.io/${{ env.IMAGE_ORG }}/nfs-server-alpine
           images: |
-            ${{ env.IMAGE_ORG }}/nfs-server-alpine
-            quay.io/${{ env.IMAGE_ORG }}/nfs-server-alpine
             ghcr.io/${{ env.IMAGE_ORG }}/nfs-server-alpine
           tags: |
             type=raw,value=latest,enable=false
@@ -344,6 +346,7 @@ jobs:
           load: false
           provenance: false
           platforms: linux/amd64
+          # tags: |
+          #   ${{ env.IMAGE_ORG }}/nfs-e2e:ci
           tags: |
-            ${{ env.IMAGE_ORG }}/nfs-e2e:ci
             ghcr.io/${{ env.IMAGE_ORG }}/nfs-e2e:ci
