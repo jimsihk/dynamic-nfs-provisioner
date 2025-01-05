@@ -1,6 +1,6 @@
 module github.com/openebs/dynamic-nfs-provisioner
 
-go 1.23.4
+go 1.23
 
 replace (
 	google.golang.org/protobuf => google.golang.org/protobuf v1.25.0
