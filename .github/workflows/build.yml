@@ -60,8 +60,8 @@ jobs:
       - name: Verify corrections
         run: make verify-src
 
-      - name: Upload Coverage Report
-        uses: codecov/codecov-action@v5
+      # - name: Upload Coverage Report
+      #   uses: codecov/codecov-action@v5
   
   sanity-build:
     # to ignore builds on release
