@@ -29,9 +29,10 @@ on:
 
 env:
   GO_VERSION: 1.19.13
-  PROVISIONER_NFS_IMAGE_NAME: provisioner-nfs
-  NFS_SERVER_IMAGE_NAME: nfs-server-alpine
-  IMAGE_EXPORT_PATH: /tmp
+  PROVISIONER_NFS_IMAGE: provisioner-nfs
+  NFS_SERVER_IMAGE: nfs-server-alpine
+  EXPORT_PATH: /tmp
+  IMAGE_ORG: ${GITHUB_REPOSITORY#*/}
 
 jobs:
   lint:
@@ -73,18 +74,10 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Build provisioner-nfs image
-        run: |
-          export PROVISIONER_NFS_IMAGE=${{ env.PROVISIONER_NFS_IMAGE_NAME }}
-          export NFS_SERVER_IMAGE=${{ env.NFS_SERVER_IMAGE_NAME }}
-          export EXPORT_PATH=${{ env.IMAGE_EXPORT_PATH }}
-          make provisioner-nfs-image
+        run: make provisioner-nfs-image
 
       - name: Build nfs-server-alpine image
-        run: |
-          export PROVISIONER_NFS_IMAGE=${{ env.PROVISIONER_NFS_IMAGE_NAME }}
-          export NFS_SERVER_IMAGE=${{ env.NFS_SERVER_IMAGE_NAME }}
-          export EXPORT_PATH=${{ env.IMAGE_EXPORT_PATH }}
-          make nfs-server-image
+        run: make nfs-server-image
 
       - name: Export images
         run: make output-image
@@ -93,13 +86,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PROVISIONER_NFS_IMAGE_NAME }}
-          path: ${{ env.IMAGE_EXPORT_PATH }}/{{ env.PROVISIONER_NFS_IMAGE_NAME }}.tar
+          path: ${{ env.IMAGE_EXPORT_PATH }}/${{ env.PROVISIONER_NFS_IMAGE_NAME }}.tar
 
       - name: Upload nfs-server-alpine image
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.NFS_SERVER_IMAGE_NAME }}
-          path: ${{ env.IMAGE_EXPORT_PATH }}/{{ env.NFS_SERVER_IMAGE_NAME }}.tar
+          path: ${{ env.IMAGE_EXPORT_PATH }}/${{ env.NFS_SERVER_IMAGE_NAME }}.tar
 
   sanity-test:
     # to ignore builds on release
@@ -132,11 +125,7 @@ jobs:
           path: ${{ env.IMAGE_EXPORT_PATH }}
 
       - name: Load images
-        run: |
-          export PROVISIONER_NFS_IMAGE=${{ env.PROVISIONER_NFS_IMAGE_NAME }}
-          export NFS_SERVER_IMAGE=${{ env.NFS_SERVER_IMAGE_NAME }}
-          export EXPORT_PATH=${{ env.IMAGE_EXPORT_PATH }}
-          make load-image
+        run: make load-image
 
       - name: Install NFS utils
         run: |
