@@ -55,7 +55,7 @@ jobs:
   sanity-test:
     # to ignore builds on release
     if: ${{ (github.event.ref_type != 'tag') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
       matrix:
