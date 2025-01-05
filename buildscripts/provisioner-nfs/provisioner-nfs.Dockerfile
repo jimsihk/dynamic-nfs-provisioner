@@ -40,7 +40,7 @@ COPY . .
 
 RUN make provisioner-nfs
 
-FROM alpine:3.12.0
+FROM alpine:3.21.0
 
 ARG DBUILD_DATE
 ARG DBUILD_REPO_URL
