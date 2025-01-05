@@ -187,16 +187,16 @@ nfs-server-image:
 .PHONY: output-image
 output-image:
 	@echo "--> Export provisioner-nfs image to ${EXPORT_PATH}";
-	@docker export --output="${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar" ${PROVISIONER_NFS_IMAGE_TAG}
+	@docker image save --output "${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar" ${PROVISIONER_NFS_IMAGE_TAG}
 	@echo "--> Export nfs-server image to ${EXPORT_PATH}";
-	@docker export --output="${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar" ${NFS_SERVER_IMAGE_TAG}
+	@docker image save --output "${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar" ${NFS_SERVER_IMAGE_TAG}
 
 .PHONY: load-image
 load-image:
 	@echo "--> Load provisioner-nfs image";
-	@docker load --input "${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar"
+	@docker image load --input "${EXPORT_PATH}/${PROVISIONER_NFS_IMAGE}.tar"
 	@echo "--> Load nfs-server image";
-	@docker load --input "${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar"
+	@docker image load --input "${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar"
 
 .PHONY: license-check
 license-check:
