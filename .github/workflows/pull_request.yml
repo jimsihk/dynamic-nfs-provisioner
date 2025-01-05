@@ -28,8 +28,8 @@ on:
       - 'v*'
 
 env:
-  GO_VERSION: 1.19.13
-  GO_VERSION_PN: 1.23.4
+  GO_VERSION_OPENEBS: 1.19.13
+  GO_VERSION: 1.23.4
   PROVISIONER_NFS_IMAGE: provisioner-nfs
   NFS_SERVER_IMAGE: nfs-server-alpine
   EXPORT_PATH: /tmp
