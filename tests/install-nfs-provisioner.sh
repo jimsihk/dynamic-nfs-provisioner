@@ -58,6 +58,8 @@ function waitForDeployment() {
 			sleep 10
 		fi
 	done
+
+	kubectl describe deployment -n ${NS} ${DEPLOY}
 }
 
 waitForDeployment openebs-nfs-provisioner openebs

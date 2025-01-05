@@ -99,7 +99,7 @@ jobs:
     if: ${{ (github.event.ref_type != 'tag') }}
     runs-on: ubuntu-22.04
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         kubernetes: [v1.27.3, v1.29.12, v1.30.8, v1.31.0]
     needs: ['lint', 'unit-test', 'sanity-build']
@@ -180,7 +180,7 @@ jobs:
           push: false
           platforms: linux/amd64, linux/arm64, linux/arm/v7, linux/ppc64le
           tags: |
-            openebs/provisioner-nfs:ci
+            ${{ env.IMAGE_ORG }}/provisioner-nfs:ci
 
   nfs-server:
     runs-on: ubuntu-latest
@@ -208,7 +208,7 @@ jobs:
           push: false
           platforms: linux/amd64, linux/arm64, linux/arm/v7, linux/ppc64le
           tags: |
-            openebs/nfs-server-alpine:ci
+            ${{ env.IMAGE_ORG }}/nfs-server-alpine:ci
 
   nfs-e2e:
     runs-on: ubuntu-latest
@@ -224,4 +224,4 @@ jobs:
           load: false
           platforms: linux/amd64
           tags: |
-            openebs/nfs-e2e:ci
+            ${{ env.IMAGE_ORG }}/nfs-e2e:ci
