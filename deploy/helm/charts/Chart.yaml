@@ -16,7 +16,7 @@ keywords:
   - dynamic-nfs-pv
   - kubernetes
 sources:
-  - https://github.com/openebs/dynamic-nfs-provisioner
+  - https://github.com/jimsihk/dynamic-nfs-provisioner
 
 maintainers:
   - name: kmova
