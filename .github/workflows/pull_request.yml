@@ -32,7 +32,7 @@ env:
   PROVISIONER_NFS_IMAGE: provisioner-nfs
   NFS_SERVER_IMAGE: nfs-server-alpine
   EXPORT_PATH: /tmp
-  IMAGE_ORG: ${GITHUB_REPOSITORY#*/}
+  IMAGE_ORG: ${{ github.event.repository.name }}
 
 jobs:
   lint:
@@ -85,14 +85,14 @@ jobs:
       - name: Upload provisioner-nfs image
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.PROVISIONER_NFS_IMAGE_NAME }}
-          path: ${{ env.IMAGE_EXPORT_PATH }}/${{ env.PROVISIONER_NFS_IMAGE_NAME }}.tar
+          name: ${{ env.PROVISIONER_NFS_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}/${{ env.PROVISIONER_NFS_IMAGE }}.tar
 
       - name: Upload nfs-server-alpine image
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.NFS_SERVER_IMAGE_NAME }}
-          path: ${{ env.IMAGE_EXPORT_PATH }}/${{ env.NFS_SERVER_IMAGE_NAME }}.tar
+          name: ${{ env.NFS_SERVER_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}/${{ env.NFS_SERVER_IMAGE }}.tar
 
   sanity-test:
     # to ignore builds on release
@@ -115,14 +115,14 @@ jobs:
       - name: Download provisioner-nfs image
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PROVISIONER_NFS_IMAGE_NAME }}
-          path: ${{ env.IMAGE_EXPORT_PATH }}
+          name: ${{ env.PROVISIONER_NFS_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}
 
       - name: Download nfs-server-alpine image
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.NFS_SERVER_IMAGE_NAME }}
-          path: ${{ env.IMAGE_EXPORT_PATH }}
+          name: ${{ env.NFS_SERVER_IMAGE }}
+          path: ${{ env.EXPORT_PATH }}
 
       - name: Load images
         run: make load-image
