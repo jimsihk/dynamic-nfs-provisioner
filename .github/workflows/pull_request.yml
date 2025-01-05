@@ -33,6 +33,7 @@ env:
   NFS_SERVER_IMAGE: nfs-server-alpine
   EXPORT_PATH: /tmp
   IMAGE_ORG: ${{ github.repository_owner }}
+  IMAGE_ARCH: linux/amd64,linux/arm64,linux/arm/v7,linux/ppc64le
 
 jobs:
   lint:
@@ -178,7 +179,7 @@ jobs:
           context: .
           file: ./buildscripts/provisioner-nfs/provisioner-nfs.Dockerfile
           push: false
-          platforms: linux/amd64, linux/arm64, linux/arm/v7, linux/ppc64le
+          platforms: ${{ env.IMAGE_ARCH }}
           tags: |
             ${{ env.IMAGE_ORG }}/provisioner-nfs:ci
 
@@ -206,7 +207,7 @@ jobs:
           context: ./nfs-server-container
           file: nfs-server-container/Dockerfile
           push: false
-          platforms: linux/amd64, linux/arm64, linux/arm/v7, linux/ppc64le
+          platforms: ${{ env.IMAGE_ARCH }}
           tags: |
             ${{ env.IMAGE_ORG }}/nfs-server-alpine:ci
 
