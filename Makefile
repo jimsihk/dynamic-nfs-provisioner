@@ -220,7 +220,7 @@ license-check:
 .PHONY: sanity-test
 sanity-test:
 	@echo "--> Running sanity test";
-	@go install github.com/onsi/ginkgo/v2/ginkgo
+	@go install github.com/onsi/ginkgo/ginkgo@v1.16.4
 	@cd tests && sudo -E env "PATH=${PATH}" ginkgo -v -failFast
 
 .PHONY: push
