@@ -207,7 +207,7 @@ test-run-provisioner-nfs-image:
 .PHONY: test-run-nfs-server-image
 test-run-nfs-server-image:
 	@echo "--> Test running nfs-server-image image";
-	@docker run --rm -t --timeout 60s ${PROVISIONER_NFS_IMAGE_TAG}
+	@docker run --rm -t --timeout 60s ${NFS_SERVER_IMAGE_TAG}
 
 .PHONY: license-check
 license-check:
