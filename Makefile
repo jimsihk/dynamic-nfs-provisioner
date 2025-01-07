@@ -198,6 +198,17 @@ load-image:
 	@echo "--> Load nfs-server image";
 	@docker image load --input "${EXPORT_PATH}/${NFS_SERVER_IMAGE}.tar"
 
+# Use this to perform simple test on the image before full sanity test
+.PHONY: test-run-provisioner-nfs-image
+test-run-provisioner-nfs-image:
+	@echo "--> Test running provisioner-nfs image";
+	@docker run --rm -t --timeout 60s ${PROVISIONER_NFS_IMAGE_TAG}
+
+.PHONY: test-run-nfs-server-image
+test-run-nfs-server-image:
+	@echo "--> Test running nfs-server-image image";
+	@docker run --rm -t --timeout 60s ${PROVISIONER_NFS_IMAGE_TAG}
+
 .PHONY: license-check
 license-check:
 	@echo "--> Checking license header..."
