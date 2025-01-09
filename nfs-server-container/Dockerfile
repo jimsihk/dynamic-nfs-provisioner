@@ -9,7 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.21.1
+FROM alpine:3.21.2
 #LABEL maintainer "Steven Iveson <steve@iveson.eu>"
 #LABEL source "https://github.com/sjiveson/nfs-server-alpine"
 #LABEL branch "master"
