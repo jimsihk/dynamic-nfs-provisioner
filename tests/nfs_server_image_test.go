@@ -45,7 +45,7 @@ var _ = Describe("TEST NFS SERVER IMAGE CONFIGURATION", func() {
 		nfsProvisionerLabel         = "openebs.io/component-name=openebs-nfs-provisioner"
 		nfsProvisionerContainerName = "openebs-provisioner-nfs"
 		nfsServerImage              = "jimsihk/nfs-server-alpine:ci"
-		prevVersionNFSServerImage   = "openebs/nfs-server-alpine:0.4.0"
+		prevVersionNFSServerImage   = "openebs/nfs-server-alpine:0.11.0"
 	)
 
 	When("nfs server image is updated", func() {

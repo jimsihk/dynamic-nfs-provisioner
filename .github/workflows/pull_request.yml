@@ -28,7 +28,8 @@ on:
       - 'v*'
 
 env:
-  GO_VERSION: 1.19.13
+  GO_VERSION_OPENEBS: 1.19.13
+  GO_VERSION: 1.23.4
   PROVISIONER_NFS_IMAGE: provisioner-nfs
   NFS_SERVER_IMAGE: nfs-server-alpine
   EXPORT_PATH: /tmp
@@ -64,6 +65,17 @@ jobs:
     # to ignore builds on release
     if: ${{ (github.event.ref_type != 'tag') }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [provisioner-nfs, nfs-server-alpine]
+        include:
+          - image: provisioner-nfs
+            go_version: v1.23.4
+            make_step: provisioner-nfs-image
+          - image: nfs-server-alpine
+            go_version: v1.19.13
+            make_step: nfs-server-image
     needs: ['lint', 'unit-test']
     steps:
       - name: Checkout
@@ -72,28 +84,19 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version: ${{ matrix.go_version }}
 
-      - name: Build provisioner-nfs image
-        run: make provisioner-nfs-image
-
-      - name: Build nfs-server-alpine image
-        run: make nfs-server-image
+      - name: Build image
+        run: make ${{ matrix.make_step }}
 
       - name: Export images
-        run: make output-image
+        run: make output-${{ matrix.make_step }}
 
-      - name: Upload provisioner-nfs image
+      - name: Upload image
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.PROVISIONER_NFS_IMAGE }}
-          path: ${{ env.EXPORT_PATH }}/${{ env.PROVISIONER_NFS_IMAGE }}.tar
-
-      - name: Upload nfs-server-alpine image
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.NFS_SERVER_IMAGE }}
-          path: ${{ env.EXPORT_PATH }}/${{ env.NFS_SERVER_IMAGE }}.tar
+          name: ${{ matrix.image }}
+          path: ${{ env.EXPORT_PATH }}/${{ matrix.image }}.tar
 
   sanity-test:
     # to ignore builds on release
@@ -170,8 +173,6 @@ jobs:
       - name: Setup Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          version: v0.5.1
 
       - name: Build Image
         uses: docker/build-push-action@v6

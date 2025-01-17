@@ -12,7 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-FROM alpine:3.12
+FROM alpine:3.21.2
 
 RUN apk add --no-cache \
     iproute2 \
@@ -27,13 +27,17 @@ RUN apk add --no-cache \
 
 # Download and install glibc
 ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc
-ENV GLIBC_VERSION=2.30-r0
+ENV GLIBC_VERSION=2.35-r1
 
 RUN set -ex && \
     apk --update add libstdc++ curl ca-certificates && \
+    apk add --no-cache --virtual .build-deps binutils gcompat && \
     for pkg in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION}; \
         do curl -sSL ${GLIBC_REPO}/releases/download/${GLIBC_VERSION}/${pkg}.apk -o /tmp/${pkg}.apk; done && \
-    apk add --allow-untrusted /tmp/*.apk && \
+    # Workaround for Alpine 3.19+: https://github.com/sgerrand/alpine-pkg-glibc/issues/208#issuecomment-1931353838
+    apk add --allow-untrusted --force-overwrite --no-cache /tmp/glibc-${GLIBC_VERSION}.apk && \
+    apk del gcompat && \
+    apk add --allow-untrusted --no-cache /tmp/glibc-bin-${GLIBC_VERSION}.apk && \
     rm -v /tmp/*.apk && \
     /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
