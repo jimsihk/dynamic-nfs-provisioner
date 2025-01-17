@@ -34,7 +34,7 @@ stop()
 get_nfs_args() {
   declare -n args=$1
 
-  args=(--debug 8 --no-udp --no-nfs-version 2 --no-nfs-version 3)
+  args=(--debug 8 --no-udp --no-nfs-version 3)
 
   # here we are checking if variable exist and its value is not null
   if [ ! -z ${NFS_GRACE_TIME:+x} ]; then
